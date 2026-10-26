@@ -569,8 +569,47 @@ type ChanceMeta = { seed: string; procedure: string; deck: { id: string; version
  * `method` to replay a cast exactly.
  */
 
-import { HEXAGRAMS, HEXAGRAM_BY_NUMBER, HEXAGRAM_BY_BINARY, type Hexagram } from './hexagrams.js';
+import type { Hexagram } from './hexagrams.js';
 import { TRIGRAMS, type Trigram } from './trigrams.js';
+
+// fleet #3615 (bundle-size incident #2754 follow-on): the 64-hexagram table
+// used to be a module-scope VALUE import of ./hexagrams.js, so every gateway
+// isolate carried it whether or not it ever served an i-ching call. It is now
+// a BAKED INDEX: registered in workers/gateway/src/pack-baked-indexes.json,
+// uploaded to KV at deploy, and injected as args._bakedIndex on every call
+// into this pack. Adopted once and kept for the isolate's life.
+//
+// NEVER value-import ./hexagrams.js here again — a type-only import is
+// erased, a value import puts the whole table back into every isolate.
+let HEXAGRAMS: Hexagram[] = [];
+let hexagramByNumber: Map<number, Hexagram> | null = null;
+let hexagramByBinary: Map<string, Hexagram> | null = null;
+
+function ensureHexagrams(args: Record<string, unknown>): void {
+  if (HEXAGRAMS.length) return;
+  const idx = args._bakedIndex as Record<string, unknown> | null | undefined;
+  const hexagrams = idx?.HEXAGRAMS;
+  if (!Array.isArray(hexagrams) || hexagrams.length === 0) {
+    throw new Error(
+      `i-ching: the hexagram table is unavailable (${idx == null ? 'not injected' : 'malformed'}). ` +
+        'The gateway loads it from KV on the first call into this pack; this is a server-side fault, not a bad query — retry shortly.',
+    );
+  }
+  HEXAGRAMS = hexagrams as Hexagram[];
+}
+
+function getHexagramByNumber(): Map<number, Hexagram> {
+  if (hexagramByNumber) return hexagramByNumber;
+  hexagramByNumber = new Map(HEXAGRAMS.map((h) => [h.number, h]));
+  return hexagramByNumber;
+}
+
+/** Binary string (bottom to top, e.g. "111111") -> hexagram, for resolving a cast. */
+function getHexagramByBinary(): Map<string, Hexagram> {
+  if (hexagramByBinary) return hexagramByBinary;
+  hexagramByBinary = new Map(HEXAGRAMS.map((h) => [h.lines.join(''), h]));
+  return hexagramByBinary;
+}
 
 const DECK_ID = 'i-ching-hexagrams';
 const DECK_VERSION = 'v1';
@@ -655,7 +694,7 @@ function meta(seed: string, procedure: string): ChanceMeta {
 }
 
 function findByNumber(n: number): Hexagram | undefined {
-  return HEXAGRAM_BY_NUMBER.get(n);
+  return getHexagramByNumber().get(n);
 }
 
 // Strips tone-mark diacritics (NFD-decompose, drop combining marks) and
@@ -739,6 +778,7 @@ const tools: McpToolExport['tools'] = [
 ];
 
 async function callTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+  ensureHexagrams(args);
   switch (name) {
     case 'cast_i_ching': {
       const method = args.method === 'yarrow' ? 'yarrow' : 'coins';
@@ -754,7 +794,7 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
 
       const primaryBits = lineValues.map(lineToBit) as Hexagram['lines'];
       const primaryKey = primaryBits.join('');
-      const primary = HEXAGRAM_BY_BINARY.get(primaryKey);
+      const primary = getHexagramByBinary().get(primaryKey);
       if (!primary) {
         throw new Error(
           `i-ching: cast produced an unrecognized line pattern "${primaryKey}" — this is an internal error, not a valid result.`,
@@ -776,7 +816,7 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
       if (changingLines.length > 0) {
         const resultingBits = lineValues.map(resultingBit) as Hexagram['lines'];
         const resultingKey = resultingBits.join('');
-        const resultingHex = HEXAGRAM_BY_BINARY.get(resultingKey);
+        const resultingHex = getHexagramByBinary().get(resultingKey);
         if (!resultingHex) {
           throw new Error(
             `i-ching: resulting cast produced an unrecognized line pattern "${resultingKey}" — this is an internal error, not a valid result.`,

@@ -15,7 +15,7 @@
  * short original gloss, not a quotation from any source.
  */
 
-import { TRIGRAMS, type TrigramKey } from './trigrams.js';
+import type { TrigramKey } from './trigrams.js';
 
 export interface Hexagram {
   number: number;
@@ -31,29 +31,20 @@ export interface Hexagram {
   keywords: string[];
 }
 
-function lines6(lower: TrigramKey, upper: TrigramKey): [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1] {
-  const l = TRIGRAMS[lower].lines;
-  const u = TRIGRAMS[upper].lines;
-  return [l[0], l[1], l[2], u[0], u[1], u[2]];
-}
+// fleet #3615: `lines` used to be computed at module scope by VALUE-importing
+// trigrams.ts (lines6(lowerTrigram, upperTrigram)). A baked-index data module
+// may only TYPE-import another local module (Node's plain `import()` under
+// type stripping does not resolve a value import's own re-exports the way
+// tsc's compiler-time resolution does, and the gateway's uploader/loader
+// dynamically imports this exact file), so each hexagram's six-line pattern
+// is now baked in literally below instead of derived. Values are unchanged;
+// see trigrams.ts for the authoritative bit pattern per trigram (used
+// directly by index.ts for trigram display, not by this module).
+export const HEXAGRAMS: Hexagram[] = [
 
-interface RawHexagram {
-  number: number;
-  nameChinese: string;
-  pinyin: string;
-  nameEnglish: string;
-  lowerTrigram: TrigramKey;
-  upperTrigram: TrigramKey;
-  judgment: string;
-  image: string;
-  lineTexts: [string, string, string, string, string, string];
-  keywords: string[];
-}
-
-const RAW: RawHexagram[] = [
   {
     number: 1, nameChinese: '乾', pinyin: 'Qián', nameEnglish: 'Pure Yang',
-    lowerTrigram: 'qian', upperTrigram: 'qian',
+    lines: [1, 1, 1, 1, 1, 1], lowerTrigram: 'qian', upperTrigram: 'qian',
     judgment: 'Unmixed creative force, active without pause. Great success comes to one who holds steady and principled through sustained effort.',
     image: 'Heaven moves without ceasing above heaven; the capable one strengthens themselves without rest.',
     lineTexts: [
@@ -68,7 +59,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 2, nameChinese: '坤', pinyin: 'Kūn', nameEnglish: 'Pure Yin',
-    lowerTrigram: 'kun', upperTrigram: 'kun',
+    lines: [0, 0, 0, 0, 0, 0], lowerTrigram: 'kun', upperTrigram: 'kun',
     judgment: "Unmixed receptive force, yielding and sustaining. Advantage comes through following rather than leading, like a mare content to be guided.",
     image: "Earth's nature is utter devotion; the capable one carries all things with a broad and generous character.",
     lineTexts: [
@@ -83,7 +74,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 3, nameChinese: '屯', pinyin: 'Zhūn', nameEnglish: 'Sprouting',
-    lowerTrigram: 'zhen', upperTrigram: 'kan',
+    lines: [1, 0, 0, 0, 1, 0], lowerTrigram: 'zhen', upperTrigram: 'kan',
     judgment: 'Difficulty attends every true beginning. Perseverance is rewarded, but it is not yet time to act alone — gather helpers first.',
     image: 'Clouds and thunder: a beginning charged with difficulty; the capable one brings order out of confusion by careful arrangement.',
     lineTexts: [
@@ -98,7 +89,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 4, nameChinese: '蒙', pinyin: 'Méng', nameEnglish: 'Unlearned',
-    lowerTrigram: 'kan', upperTrigram: 'gen',
+    lines: [0, 1, 0, 0, 0, 1], lowerTrigram: 'kan', upperTrigram: 'gen',
     judgment: 'Inexperience seeks instruction; it is the student, not the teacher, who must ask twice before being doubted. Firm but patient guidance brings success.',
     image: 'A spring rises at the foot of the mountain: an image of beginnings; the capable one acts with resolve to nurture character through right conduct.',
     lineTexts: [
@@ -113,7 +104,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 5, nameChinese: '需', pinyin: 'Xū', nameEnglish: 'Biding Time',
-    lowerTrigram: 'qian', upperTrigram: 'kan',
+    lines: [1, 1, 1, 0, 1, 0], lowerTrigram: 'qian', upperTrigram: 'kan',
     judgment: 'Strength waits at the edge of danger. Sincerity and patience bring success; crossing comes when the moment is ready, not before.',
     image: 'Clouds gather above heaven: rain is still to come; the capable one eats, drinks, and stays at ease while awaiting the moment.',
     lineTexts: [
@@ -128,7 +119,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 6, nameChinese: '訟', pinyin: 'Sòng', nameEnglish: 'Dispute',
-    lowerTrigram: 'kan', upperTrigram: 'qian',
+    lines: [0, 1, 0, 1, 1, 1], lowerTrigram: 'kan', upperTrigram: 'qian',
     judgment: 'Sincerity obstructed breeds conflict. Caution brings a good outcome partway through; pressing a dispute to its limit brings misfortune, and crossing great waters is unwise.',
     image: 'Heaven and water move in opposing directions: the image of conflict; the capable one plans carefully from the very start of any undertaking to avoid it.',
     lineTexts: [
@@ -143,7 +134,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 7, nameChinese: '師', pinyin: 'Shī', nameEnglish: 'The Multitude',
-    lowerTrigram: 'kan', upperTrigram: 'kun',
+    lines: [0, 1, 0, 0, 0, 0], lowerTrigram: 'kan', upperTrigram: 'kun',
     judgment: 'An army led by one who is experienced and fair brings good fortune without blame; discipline in a mass of people is the whole of the matter.',
     image: 'Water gathered within the earth: the image of the multitude; the capable one tends the people and accumulates the masses’ strength.',
     lineTexts: [
@@ -158,7 +149,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 8, nameChinese: '比', pinyin: 'Bǐ', nameEnglish: 'Alliance',
-    lowerTrigram: 'kun', upperTrigram: 'kan',
+    lines: [0, 0, 0, 0, 1, 0], lowerTrigram: 'kun', upperTrigram: 'kan',
     judgment: 'Union with the right companions brings good fortune. One who comes late to the alliance meets misfortune — seek connection without delay.',
     image: 'Water rests upon the earth: the image of close union; the ancient kings founded the myriad states and drew close to their lords.',
     lineTexts: [
@@ -173,7 +164,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 9, nameChinese: '小畜', pinyin: 'Xiǎo Chù', nameEnglish: 'Small Restraint',
-    lowerTrigram: 'qian', upperTrigram: 'xun',
+    lines: [1, 1, 1, 0, 1, 1], lowerTrigram: 'qian', upperTrigram: 'xun',
     judgment: 'Gentle restraint holds back a strong force for a while, like dense clouds that have not yet released their rain. Small gains are possible; a larger breakthrough must wait.',
     image: 'Wind moves across heaven: the image of small restraint; the capable one refines inner character through small, deliberate acts.',
     lineTexts: [
@@ -188,7 +179,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 10, nameChinese: '履', pinyin: 'Lǚ', nameEnglish: 'Careful Tread',
-    lowerTrigram: 'dui', upperTrigram: 'qian',
+    lines: [1, 1, 0, 1, 1, 1], lowerTrigram: 'dui', upperTrigram: 'qian',
     judgment: "Treading carefully even behind something as dangerous as a tiger's tail; mindful conduct passes safely through where carelessness would not.",
     image: 'Heaven above, the lake below: the image of careful distinction; the capable one discerns high from low and settles the aims of the people.',
     lineTexts: [
@@ -203,7 +194,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 11, nameChinese: '泰', pinyin: 'Tài', nameEnglish: 'Flourishing',
-    lowerTrigram: 'qian', upperTrigram: 'kun',
+    lines: [1, 1, 1, 0, 0, 0], lowerTrigram: 'qian', upperTrigram: 'kun',
     judgment: 'Heaven and earth exchange freely; the small departs and the great arrives. A time of flourishing communication and good fortune.',
     image: 'Heaven and earth are in union: the image of flourishing peace; rulers and ministers divide and complete the course of heaven and earth to help the people.',
     lineTexts: [
@@ -218,7 +209,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 12, nameChinese: '否', pinyin: 'Pǐ', nameEnglish: 'Blockage',
-    lowerTrigram: 'kun', upperTrigram: 'qian',
+    lines: [0, 0, 0, 1, 1, 1], lowerTrigram: 'kun', upperTrigram: 'qian',
     judgment: 'Heaven and earth no longer exchange; the way is blocked for the capable. A time to withdraw, conserve integrity, and wait rather than force the issue.',
     image: 'Heaven and earth do not meet: the image of blockage; the capable one restrains their own virtue to avoid difficulty and declines rank and reward.',
     lineTexts: [
@@ -233,7 +224,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 13, nameChinese: '同人', pinyin: 'Tóng Rén', nameEnglish: 'Common Cause',
-    lowerTrigram: 'li', upperTrigram: 'qian',
+    lines: [1, 0, 1, 1, 1, 1], lowerTrigram: 'li', upperTrigram: 'qian',
     judgment: 'Fellowship found in the open, not in a private circle, brings success and favors great undertakings. Shared purpose should serve the common good, not a faction.',
     image: 'Heaven together with fire: the image of fellowship; the capable one organizes people by their kinds and distinguishes what truly unites them.',
     lineTexts: [
@@ -248,7 +239,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 14, nameChinese: '大有', pinyin: 'Dà Yǒu', nameEnglish: 'Abundant Holdings',
-    lowerTrigram: 'qian', upperTrigram: 'li',
+    lines: [1, 1, 1, 1, 0, 1], lowerTrigram: 'qian', upperTrigram: 'li',
     judgment: 'Great abundance held by one of true and modest character brings supreme success. What is gathered should serve, not merely be possessed.',
     image: 'Fire above heaven: the image of great possession; the capable one checks what is evil and promotes what is good, in obedience to the will of heaven.',
     lineTexts: [
@@ -263,7 +254,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 15, nameChinese: '謙', pinyin: 'Qiān', nameEnglish: 'Modesty',
-    lowerTrigram: 'gen', upperTrigram: 'kun',
+    lines: [0, 0, 1, 0, 0, 0], lowerTrigram: 'gen', upperTrigram: 'kun',
     judgment: "The modest one carries success to completion. Heaven's way diminishes the full and enriches the humble; the capable one ends well by never claiming too much.",
     image: 'A mountain hidden within the earth: the image of modesty; the capable one levels off the excess of the high and adds to the deficiency of the low, weighing things evenly.',
     lineTexts: [
@@ -278,7 +269,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 16, nameChinese: '豫', pinyin: 'Yù', nameEnglish: 'Readiness',
-    lowerTrigram: 'kun', upperTrigram: 'zhen',
+    lines: [0, 0, 0, 1, 0, 0], lowerTrigram: 'kun', upperTrigram: 'zhen',
     judgment: 'Readiness brings advantage to those who establish helpers and set armies in motion with enthusiasm. Joy shared with others carries great undertakings forward.',
     image: 'Thunder bursts forth from the earth: the image of readiness; the ancient kings made music to honor virtue and offered it to the gods and ancestors.',
     lineTexts: [
@@ -293,7 +284,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 17, nameChinese: '隨', pinyin: 'Suí', nameEnglish: 'Following',
-    lowerTrigram: 'zhen', upperTrigram: 'dui',
+    lines: [1, 0, 0, 1, 1, 0], lowerTrigram: 'zhen', upperTrigram: 'dui',
     judgment: 'Great success comes to one who knows when to follow rather than lead. Steadiness in following what is right brings no blame.',
     image: 'Thunder rests within the lake: the image of following; the capable one goes indoors to rest as evening comes, following the rhythm of the day.',
     lineTexts: [
@@ -308,7 +299,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 18, nameChinese: '蠱', pinyin: 'Gǔ', nameEnglish: 'Repairing Decay',
-    lowerTrigram: 'xun', upperTrigram: 'gen',
+    lines: [0, 1, 1, 0, 0, 1], lowerTrigram: 'xun', upperTrigram: 'gen',
     judgment: 'Work on what has decayed brings great success, but it is best begun after careful thought, before the event, and followed through after — three days each side.',
     image: 'Wind stirs at the foot of the mountain: the image of decay; the capable one rouses the people and strengthens their character.',
     lineTexts: [
@@ -323,7 +314,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 19, nameChinese: '臨', pinyin: 'Lín', nameEnglish: 'Drawing Near',
-    lowerTrigram: 'dui', upperTrigram: 'kun',
+    lines: [1, 1, 0, 0, 0, 0], lowerTrigram: 'dui', upperTrigram: 'kun',
     judgment: 'Drawing near with supreme success; but what approaches and grows will in time decline, so perseverance in virtue matters more than momentum.',
     image: 'Earth above the lake: the image of drawing near; the capable one is inexhaustible in teaching and boundless in nurturing the people.',
     lineTexts: [
@@ -338,7 +329,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 20, nameChinese: '觀', pinyin: 'Guān', nameEnglish: 'Observation',
-    lowerTrigram: 'kun', upperTrigram: 'xun',
+    lines: [0, 0, 0, 0, 1, 1], lowerTrigram: 'kun', upperTrigram: 'xun',
     judgment: 'Observation from a position of quiet integrity, like a ritual ablution before the offering rather than the offering itself, inspires trust in those who watch.',
     image: 'Wind moves above the earth: the image of observation; the ancient kings traveled the regions, observed the people, and instructed them accordingly.',
     lineTexts: [
@@ -353,7 +344,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 21, nameChinese: '噬嗑', pinyin: 'Shì Kè', nameEnglish: 'Biting Through',
-    lowerTrigram: 'zhen', upperTrigram: 'li',
+    lines: [1, 0, 0, 1, 0, 1], lowerTrigram: 'zhen', upperTrigram: 'li',
     judgment: 'Decisive action, like biting through an obstruction between the jaws, brings success; it favors the use of clear judgment, as in administering justice.',
     image: 'Thunder and lightning together: the image of biting through; the ancient kings made penalties clear and set forth the laws plainly.',
     lineTexts: [
@@ -368,7 +359,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 22, nameChinese: '賁', pinyin: 'Bì', nameEnglish: 'Adornment',
-    lowerTrigram: 'li', upperTrigram: 'gen',
+    lines: [1, 0, 1, 0, 0, 1], lowerTrigram: 'li', upperTrigram: 'gen',
     judgment: 'Adornment brings success in small matters; appearance should serve substance, not replace it, so there is little advantage in great undertakings built on show alone.',
     image: 'Fire at the foot of the mountain: the image of adornment; the capable one makes governance clear in small affairs but dares not decide great cases by appearance alone.',
     lineTexts: [
@@ -383,7 +374,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 23, nameChinese: '剝', pinyin: 'Bō', nameEnglish: 'Stripping Away',
-    lowerTrigram: 'kun', upperTrigram: 'gen',
+    lines: [0, 0, 0, 0, 0, 1], lowerTrigram: 'kun', upperTrigram: 'gen',
     judgment: 'A time when what is below is stripped away and weakened; it is not advantageous to go anywhere. Patience and withdrawal are wiser than resistance.',
     image: 'A mountain rests upon the earth: the image of stripping away; those above find security only by enriching those below.',
     lineTexts: [
@@ -398,7 +389,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 24, nameChinese: '復', pinyin: 'Fù', nameEnglish: 'Return',
-    lowerTrigram: 'zhen', upperTrigram: 'kun',
+    lines: [1, 0, 0, 0, 0, 0], lowerTrigram: 'zhen', upperTrigram: 'kun',
     judgment: 'Return brings success; what has departed comes back in its own time, like friends returning without blame. Movement resumes gently, not by force.',
     image: 'Thunder within the earth: the image of return; the ancient kings closed the passes at the solstice so that travelers did not move and rulers did not inspect the regions.',
     lineTexts: [
@@ -413,7 +404,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 25, nameChinese: '無妄', pinyin: 'Wú Wàng', nameEnglish: 'Without Falsehood',
-    lowerTrigram: 'zhen', upperTrigram: 'qian',
+    lines: [1, 0, 0, 1, 1, 1], lowerTrigram: 'zhen', upperTrigram: 'qian',
     judgment: 'Acting without pretense brings great success and reward to one who is upright, but a path pursued for the wrong reason brings misfortune regardless of effort.',
     image: 'Thunder moves beneath heaven: the image of innocence without falsehood; the ancient kings, in abundant vigor, nurtured all things in their proper season.',
     lineTexts: [
@@ -428,7 +419,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 26, nameChinese: '大畜', pinyin: 'Dà Xù', nameEnglish: 'Great Restraint',
-    lowerTrigram: 'qian', upperTrigram: 'gen',
+    lines: [1, 1, 1, 0, 0, 1], lowerTrigram: 'qian', upperTrigram: 'gen',
     judgment: 'Great accumulated strength held in firm restraint brings advantage through perseverance; it favors crossing the great stream, for stored strength supports bold action when the time is right.',
     image: 'A mountain contains heaven within it: the image of great restraint; the capable one studies the deeds and words of the past to build up their own character.',
     lineTexts: [
@@ -443,7 +434,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 27, nameChinese: '頤', pinyin: 'Yí', nameEnglish: 'Nourishing',
-    lowerTrigram: 'zhen', upperTrigram: 'gen',
+    lines: [1, 0, 0, 0, 0, 1], lowerTrigram: 'zhen', upperTrigram: 'gen',
     judgment: 'Nourishment rightly given brings good fortune; observe what a person seeks to nourish, and by what means, to understand their true character.',
     image: 'Thunder at the foot of the mountain: the image of nourishment; the capable one is careful in speech and moderate in eating and drinking.',
     lineTexts: [
@@ -458,7 +449,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 28, nameChinese: '大過', pinyin: 'Dà Guò', nameEnglish: 'Great Excess',
-    lowerTrigram: 'xun', upperTrigram: 'dui',
+    lines: [0, 1, 1, 1, 1, 0], lowerTrigram: 'xun', upperTrigram: 'dui',
     judgment: 'The ridgepole sags under great excess; it is a critical time, demanding decisive action even where the usual supports have given way.',
     image: 'The lake rises over the trees: the image of great excess; the capable one stands alone without fear and withdraws from the world without regret.',
     lineTexts: [
@@ -473,7 +464,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 29, nameChinese: '坎', pinyin: 'Kǎn', nameEnglish: 'Repeated Peril',
-    lowerTrigram: 'kan', upperTrigram: 'kan',
+    lines: [0, 1, 0, 0, 1, 0], lowerTrigram: 'kan', upperTrigram: 'kan',
     judgment: 'Repeated danger, like water flowing through successive chasms, is passed through by sincerity and consistent action, not by struggle against it.',
     image: 'Water flows on continuously, filling each hollow before moving forward: the capable one practices constant virtue and carries on the business of teaching.',
     lineTexts: [
@@ -488,7 +479,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 30, nameChinese: '離', pinyin: 'Lí', nameEnglish: 'Clinging Brightness',
-    lowerTrigram: 'li', upperTrigram: 'li',
+    lines: [1, 0, 1, 1, 0, 1], lowerTrigram: 'li', upperTrigram: 'li',
     judgment: "Brightness clings to what nourishes it, as fire needs fuel; perseverance in what is right, with gentle devotion like a cow's docility, brings success.",
     image: 'Brightness doubled makes fire: the capable one, like a great light, illumines all four quarters.',
     lineTexts: [
@@ -503,7 +494,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 31, nameChinese: '咸', pinyin: 'Xián', nameEnglish: 'Mutual Attraction',
-    lowerTrigram: 'gen', upperTrigram: 'dui',
+    lines: [0, 0, 1, 1, 1, 0], lowerTrigram: 'gen', upperTrigram: 'dui',
     judgment: 'Mutual attraction, like a young man courting a young woman, brings success through receptivity; it favors firm and steady connection over haste.',
     image: 'A lake rests upon the mountain: the image of mutual influence; the capable one keeps an open mind, ready to receive others.',
     lineTexts: [
@@ -518,7 +509,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 32, nameChinese: '恆', pinyin: 'Héng', nameEnglish: 'Constancy',
-    lowerTrigram: 'xun', upperTrigram: 'zhen',
+    lines: [0, 1, 1, 1, 0, 0], lowerTrigram: 'xun', upperTrigram: 'zhen',
     judgment: 'Constancy brings success and freedom from blame; advantage comes from perseverance and from having somewhere definite to go, not from standing still.',
     image: 'Thunder and wind together: the image of constancy; the capable one stands firm and does not change direction with every circumstance.',
     lineTexts: [
@@ -533,7 +524,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 33, nameChinese: '遯', pinyin: 'Dùn', nameEnglish: 'Withdrawal',
-    lowerTrigram: 'gen', upperTrigram: 'qian',
+    lines: [0, 0, 1, 1, 1, 1], lowerTrigram: 'gen', upperTrigram: 'qian',
     judgment: 'Withdrawal in good time brings success; small gains are still possible for one who perseveres in retreating with dignity rather than lingering too long.',
     image: 'A mountain beneath heaven: the image of withdrawal; the capable one keeps the small-minded at a distance, not with hatred but with dignified reserve.',
     lineTexts: [
@@ -548,7 +539,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 34, nameChinese: '大壯', pinyin: 'Dà Zhuàng', nameEnglish: 'Great Strength',
-    lowerTrigram: 'qian', upperTrigram: 'zhen',
+    lines: [1, 1, 1, 1, 0, 0], lowerTrigram: 'qian', upperTrigram: 'zhen',
     judgment: 'Great strength favors perseverance in what is right; strength used without regard for what is proper becomes mere force and brings its own trouble.',
     image: 'Thunder sounds above heaven: the image of great strength; the capable one does not tread any path that is not proper.',
     lineTexts: [
@@ -563,7 +554,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 35, nameChinese: '晉', pinyin: 'Jìn', nameEnglish: 'Advancing',
-    lowerTrigram: 'kun', upperTrigram: 'li',
+    lines: [0, 0, 0, 1, 0, 1], lowerTrigram: 'kun', upperTrigram: 'li',
     judgment: 'Advancing favor comes to a noble lord honored with many horses and received three times in a single day; progress is natural and welcomed.',
     image: 'The sun rises over the earth: the image of advancing; the capable one makes their own bright character ever more manifest.',
     lineTexts: [
@@ -578,7 +569,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 36, nameChinese: '明夷', pinyin: 'Míng Yí', nameEnglish: 'Light Obscured',
-    lowerTrigram: 'li', upperTrigram: 'kun',
+    lines: [1, 0, 1, 0, 0, 0], lowerTrigram: 'li', upperTrigram: 'kun',
     judgment: "Light hidden beneath the earth, as in difficult times, favors perseverance through hardship while keeping one's true brightness concealed from those who would harm it.",
     image: 'Light has entered the earth: the capable one, moving among the multitude, veils their own brightness while remaining inwardly clear.',
     lineTexts: [
@@ -593,7 +584,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 37, nameChinese: '家人', pinyin: 'Jiā Rén', nameEnglish: 'Household',
-    lowerTrigram: 'li', upperTrigram: 'xun',
+    lines: [1, 0, 1, 0, 1, 1], lowerTrigram: 'li', upperTrigram: 'xun',
     judgment: "The family thrives when the woman's place within is correct; perseverance in proper roles and mutual respect brings advantage to the whole household.",
     image: 'Wind issues from fire: the image of the household; the capable one lets their words have substance and their conduct have constancy.',
     lineTexts: [
@@ -608,7 +599,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 38, nameChinese: '睽', pinyin: 'Kuí', nameEnglish: 'Estrangement',
-    lowerTrigram: 'dui', upperTrigram: 'li',
+    lines: [1, 1, 0, 1, 0, 1], lowerTrigram: 'dui', upperTrigram: 'li',
     judgment: 'In times of estrangement and division, small matters still find good fortune; great undertakings must wait until trust between parties is restored.',
     image: 'Fire above, lake below, each moving its own way: the image of estrangement; the capable one seeks harmony with others while retaining their own distinct character.',
     lineTexts: [
@@ -623,7 +614,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 39, nameChinese: '蹇', pinyin: 'Jiǎn', nameEnglish: 'Hardship',
-    lowerTrigram: 'gen', upperTrigram: 'kan',
+    lines: [0, 0, 1, 0, 1, 0], lowerTrigram: 'gen', upperTrigram: 'kan',
     judgment: 'Obstruction lies ahead; it favors the southwest, the easier path, not the northeast, the harder one. Seeking out a capable guide brings advantage through perseverance.',
     image: 'Water rests on top of the mountain: the image of obstruction; the capable one turns inward to examine and cultivate their own character.',
     lineTexts: [
@@ -638,7 +629,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 40, nameChinese: '解', pinyin: 'Xiè', nameEnglish: 'Release',
-    lowerTrigram: 'kan', upperTrigram: 'zhen',
+    lines: [0, 1, 0, 1, 0, 0], lowerTrigram: 'kan', upperTrigram: 'zhen',
     judgment: 'Release favors the southwest; where there is nowhere further to go, a return brings good fortune; where there is still somewhere to go, prompt action brings good fortune too.',
     image: 'Thunder and rain set in motion together: the image of release; the capable one pardons errors and deals leniently with offenses.',
     lineTexts: [
@@ -653,7 +644,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 41, nameChinese: '損', pinyin: 'Sǔn', nameEnglish: 'Diminishing',
-    lowerTrigram: 'dui', upperTrigram: 'gen',
+    lines: [1, 1, 0, 0, 0, 1], lowerTrigram: 'dui', upperTrigram: 'gen',
     judgment: 'Diminishing what is below to enrich what is above, done with sincerity, brings great good fortune and no blame; even simple offerings, like two small baskets, may serve the purpose.',
     image: 'A mountain stands above a lake: the image of diminishing; the capable one restrains anger and checks their own desires.',
     lineTexts: [
@@ -668,7 +659,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 42, nameChinese: '益', pinyin: 'Yì', nameEnglish: 'Augmenting',
-    lowerTrigram: 'zhen', upperTrigram: 'xun',
+    lines: [1, 0, 0, 0, 1, 1], lowerTrigram: 'zhen', upperTrigram: 'xun',
     judgment: 'Increase favors every undertaking, even crossing the great river; it is a fitting time to act, as benefit flows readily to those who move.',
     image: 'Wind and thunder together: the image of increase; the capable one, seeing good, moves toward it, and recognizing fault, corrects it.',
     lineTexts: [
@@ -683,7 +674,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 43, nameChinese: '夬', pinyin: 'Guài', nameEnglish: 'Resolute Breakthrough',
-    lowerTrigram: 'qian', upperTrigram: 'dui',
+    lines: [1, 1, 1, 1, 1, 0], lowerTrigram: 'qian', upperTrigram: 'dui',
     judgment: 'Resolute breakthrough is announced openly at the royal court; sincerity in the charge brings its own risk, so caution is still needed even in a just cause — force alone does not suffice.',
     image: 'The lake rises above heaven: the image of breakthrough; the capable one extends bounty downward and refrains from resting on past achievements.',
     lineTexts: [
@@ -698,7 +689,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 44, nameChinese: '姤', pinyin: 'Gòu', nameEnglish: 'Encounter',
-    lowerTrigram: 'xun', upperTrigram: 'qian',
+    lines: [0, 1, 1, 1, 1, 1], lowerTrigram: 'xun', upperTrigram: 'qian',
     judgment: 'An unplanned encounter, like meeting a strong woman unlooked for, calls for caution — do not enter into a lasting union with what arrives by chance alone.',
     image: 'Wind moves beneath heaven: the image of encounter; a ruler issues directives and proclaims them to the four quarters.',
     lineTexts: [
@@ -713,7 +704,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 45, nameChinese: '萃', pinyin: 'Cuì', nameEnglish: 'Gathering',
-    lowerTrigram: 'kun', upperTrigram: 'dui',
+    lines: [0, 0, 0, 1, 1, 0], lowerTrigram: 'kun', upperTrigram: 'dui',
     judgment: 'Gathering together succeeds; a king goes in person to the ancestral temple, and it favors seeing a great person — gathering calls for a worthy center around which to form.',
     image: 'The lake rises above the earth: the image of gathering; the capable one prepares weapons to guard against the unexpected.',
     lineTexts: [
@@ -728,7 +719,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 46, nameChinese: '升', pinyin: 'Shēng', nameEnglish: 'Ascending',
-    lowerTrigram: 'xun', upperTrigram: 'kun',
+    lines: [0, 1, 1, 0, 0, 0], lowerTrigram: 'xun', upperTrigram: 'kun',
     judgment: 'Ascending brings supreme success; seeing a great person brings no cause for anxiety, and setting out toward the south brings good fortune through steady effort.',
     image: 'Wood grows up within the earth: the image of ascending; the capable one, true to their nature, accumulates small things to achieve what is high and great.',
     lineTexts: [
@@ -743,7 +734,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 47, nameChinese: '困', pinyin: 'Kùn', nameEnglish: 'Confinement',
-    lowerTrigram: 'kan', upperTrigram: 'dui',
+    lines: [0, 1, 0, 1, 1, 0], lowerTrigram: 'kan', upperTrigram: 'dui',
     judgment: 'Confinement still allows success for the capable one; perseverance in what is right, and words that are not merely trusted because spoken with force, carry one through hardship.',
     image: 'The lake has no water left in it: the image of confinement; the capable one, though in distress, holds firm to purpose and fulfills their own aims.',
     lineTexts: [
@@ -758,7 +749,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 48, nameChinese: '井', pinyin: 'Jǐng', nameEnglish: 'The Well',
-    lowerTrigram: 'xun', upperTrigram: 'kan',
+    lines: [0, 1, 1, 0, 1, 0], lowerTrigram: 'xun', upperTrigram: 'kan',
     judgment: 'The well stays the same though the town around it changes; it neither decreases nor increases, and all who come may draw from it — but a rope too short, or a jug broken, serves no one.',
     image: 'Water above wood draws it upward: the image of the well; the capable one encourages the people in their work and urges them to help one another.',
     lineTexts: [
@@ -773,7 +764,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 49, nameChinese: '革', pinyin: 'Gé', nameEnglish: 'Transformation',
-    lowerTrigram: 'li', upperTrigram: 'dui',
+    lines: [1, 0, 1, 1, 1, 0], lowerTrigram: 'li', upperTrigram: 'dui',
     judgment: 'Transformation gains trust only after the fact is undeniable; on the right day it brings supreme success, favoring perseverance, and regret disappears once change is complete.',
     image: 'Fire within the lake: the image of transformation; the capable one sets the calendar in order and makes clear the succession of the seasons.',
     lineTexts: [
@@ -788,7 +779,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 50, nameChinese: '鼎', pinyin: 'Dǐng', nameEnglish: 'The Cauldron',
-    lowerTrigram: 'xun', upperTrigram: 'li',
+    lines: [0, 1, 1, 1, 0, 1], lowerTrigram: 'xun', upperTrigram: 'li',
     judgment: 'The cauldron brings supreme good fortune and success; it transforms the raw into the refined, nourishing the capable just as fire and metal together produce something new.',
     image: 'Fire above wood: the image of the cauldron; the capable one keeps their position correct and makes their charge secure.',
     lineTexts: [
@@ -803,7 +794,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 51, nameChinese: '震', pinyin: 'Zhèn', nameEnglish: 'Shock',
-    lowerTrigram: 'zhen', upperTrigram: 'zhen',
+    lines: [1, 0, 0, 1, 0, 0], lowerTrigram: 'zhen', upperTrigram: 'zhen',
     judgment: 'Shock brings success; it arrives with a sudden clap like thunder that makes one tremble, yet afterward there is relieved laughter, for the shock passes and composure returns.',
     image: 'Thunder repeated: the image of shock; the capable one, in fear and trembling, sets their own conduct in order and examines themselves.',
     lineTexts: [
@@ -818,7 +809,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 52, nameChinese: '艮', pinyin: 'Gèn', nameEnglish: 'Stillness',
-    lowerTrigram: 'gen', upperTrigram: 'gen',
+    lines: [0, 0, 1, 0, 0, 1], lowerTrigram: 'gen', upperTrigram: 'gen',
     judgment: 'Stillness like a mountain, keeping one’s back still so that the self is not felt, moving through the courtyard without seeing those present: no blame follows true inner quiet.',
     image: 'Mountains joined together: the image of stillness; the capable one does not let their thoughts go beyond their own proper place.',
     lineTexts: [
@@ -833,7 +824,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 53, nameChinese: '漸', pinyin: 'Jiàn', nameEnglish: 'Gradual Advance',
-    lowerTrigram: 'gen', upperTrigram: 'xun',
+    lines: [0, 0, 1, 0, 1, 1], lowerTrigram: 'gen', upperTrigram: 'xun',
     judgment: 'Gradual advance, like a woman given in marriage through proper ritual, brings good fortune; progress achieved step by step, in due order, endures.',
     image: 'A tree grows gradually on the mountain: the image of gradual advance; the capable one dwells in virtue and improves the customs of those around them.',
     lineTexts: [
@@ -848,7 +839,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 54, nameChinese: '歸妹', pinyin: 'Guī Mèi', nameEnglish: 'The Marrying Maiden',
-    lowerTrigram: 'dui', upperTrigram: 'zhen',
+    lines: [1, 1, 0, 1, 0, 0], lowerTrigram: 'dui', upperTrigram: 'zhen',
     judgment: 'A marriage entered into without the proper standing brings misfortune, and no advantage in any direction; what begins out of its right order rarely ends well.',
     image: 'Thunder above the lake: the image of a marriage out of order; the capable one considers the long outcome of a union, not only its beginning.',
     lineTexts: [
@@ -863,7 +854,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 55, nameChinese: '豐', pinyin: 'Fēng', nameEnglish: 'Abundance',
-    lowerTrigram: 'li', upperTrigram: 'zhen',
+    lines: [1, 0, 1, 1, 0, 0], lowerTrigram: 'li', upperTrigram: 'zhen',
     judgment: 'Abundance brings success; a sovereign may attain its heights, but abundance at its peak, like the sun at noon, soon begins to wane — it is for a season, not forever.',
     image: 'Thunder and lightning together: the image of abundance; the capable one decides disputes and carries out punishments without delay.',
     lineTexts: [
@@ -878,7 +869,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 56, nameChinese: '旅', pinyin: 'Lǚ', nameEnglish: 'The Traveler',
-    lowerTrigram: 'gen', upperTrigram: 'li',
+    lines: [0, 0, 1, 1, 0, 1], lowerTrigram: 'gen', upperTrigram: 'li',
     judgment: "The traveler finds only small success; perseverance in what is right as a guest in another's land brings good fortune, for a traveler's position is modest by nature.",
     image: 'Fire atop the mountain: the image of the traveler; the capable one is careful and restrained in imposing punishment and does not let litigation drag on.',
     lineTexts: [
@@ -893,7 +884,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 57, nameChinese: '巽', pinyin: 'Xùn', nameEnglish: 'Gentle Penetration',
-    lowerTrigram: 'xun', upperTrigram: 'xun',
+    lines: [0, 1, 1, 0, 1, 1], lowerTrigram: 'xun', upperTrigram: 'xun',
     judgment: 'Gentle, repeated influence brings small success; it favors having somewhere to go and favors seeing a great person, for gentleness works gradually rather than all at once.',
     image: 'Winds follow one another: the image of gentle penetration; the capable one reiterates their commands and carries out their affairs accordingly.',
     lineTexts: [
@@ -908,7 +899,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 58, nameChinese: '兌', pinyin: 'Duì', nameEnglish: 'Joy',
-    lowerTrigram: 'dui', upperTrigram: 'dui',
+    lines: [1, 1, 0, 1, 1, 0], lowerTrigram: 'dui', upperTrigram: 'dui',
     judgment: 'Joy brings success and favors perseverance; shared pleasure, honestly held, strengthens resolve and makes even difficult undertakings easier to bear together.',
     image: 'Lakes resting one upon another: the image of joy; the capable one joins with friends for discussion and practice of what they have learned.',
     lineTexts: [
@@ -923,7 +914,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 59, nameChinese: '渙', pinyin: 'Huàn', nameEnglish: 'Dispersal',
-    lowerTrigram: 'kan', upperTrigram: 'xun',
+    lines: [0, 1, 0, 0, 1, 1], lowerTrigram: 'kan', upperTrigram: 'xun',
     judgment: 'Dispersal brings success; a king goes to the ancestral temple, and it favors crossing the great river — scattering what has become too rigid allows new connection to form.',
     image: 'Wind moves over water: the image of dispersal; the ancient kings made offerings to the gods and established ancestral temples to gather the scattered hearts of the people.',
     lineTexts: [
@@ -938,7 +929,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 60, nameChinese: '節', pinyin: 'Jié', nameEnglish: 'Restraint',
-    lowerTrigram: 'dui', upperTrigram: 'kan',
+    lines: [1, 1, 0, 0, 1, 0], lowerTrigram: 'dui', upperTrigram: 'kan',
     judgment: 'Restraint brings success, but carried to a bitter extreme it cannot be sustained; moderate limitation, applied with perseverance, keeps resources and conduct in proper measure.',
     image: 'Water above the lake: the image of restraint; the capable one establishes measures and standards and examines virtue and conduct by them.',
     lineTexts: [
@@ -953,7 +944,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 61, nameChinese: '中孚', pinyin: 'Zhōng Fú', nameEnglish: 'Inner Sincerity',
-    lowerTrigram: 'dui', upperTrigram: 'xun',
+    lines: [1, 1, 0, 0, 1, 1], lowerTrigram: 'dui', upperTrigram: 'xun',
     judgment: 'Inner sincerity moves even pigs and fish, the least responsive of creatures; it favors crossing the great river and favors perseverance, for true trust reaches further than command.',
     image: 'Wind moves over the lake: the image of inner sincerity; the capable one deliberates over cases of punishment and delays the sentence of death.',
     lineTexts: [
@@ -968,7 +959,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 62, nameChinese: '小過', pinyin: 'Xiǎo Guò', nameEnglish: 'Small Excess',
-    lowerTrigram: 'gen', upperTrigram: 'zhen',
+    lines: [0, 0, 1, 1, 0, 0], lowerTrigram: 'gen', upperTrigram: 'zhen',
     judgment: 'Small excess brings success, and perseverance is favored; it favors small affairs rather than great ones, as a bird flying low sings more sweetly than one that soars too high and strains.',
     image: 'Thunder on the mountain: the image of small excess; the capable one, in conduct, leans toward respect in excess, in mourning toward grief in excess, in spending toward thrift in excess.',
     lineTexts: [
@@ -983,7 +974,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 63, nameChinese: '既濟', pinyin: 'Jì Jì', nameEnglish: 'Already Across',
-    lowerTrigram: 'li', upperTrigram: 'kan',
+    lines: [1, 0, 1, 0, 1, 0], lowerTrigram: 'li', upperTrigram: 'kan',
     judgment: 'Already across the river, success is achieved in small matters, with advantage in perseverance; good fortune comes at the start, but disorder may follow if vigilance is relaxed once the crossing is done.',
     image: 'Water above fire: the image of completion already achieved; the capable one thinks of coming trouble in advance and takes precaution against it.',
     lineTexts: [
@@ -998,7 +989,7 @@ const RAW: RawHexagram[] = [
   },
   {
     number: 64, nameChinese: '未濟', pinyin: 'Wèi Jì', nameEnglish: 'Not Yet Across',
-    lowerTrigram: 'kan', upperTrigram: 'li',
+    lines: [0, 1, 0, 1, 0, 1], lowerTrigram: 'kan', upperTrigram: 'li',
     judgment: 'Not yet across the river, success is still possible, as with a young fox who wets its tail near the end of the crossing; care through to the very finish is what completes the work.',
     image: 'Fire above water: the image of incompletion; the capable one carefully distinguishes the qualities of things and keeps each in its proper place.',
     lineTexts: [
@@ -1013,21 +1004,10 @@ const RAW: RawHexagram[] = [
   },
 ];
 
-export const HEXAGRAMS: Hexagram[] = RAW.map((h) => ({
-  ...h,
-  lines: lines6(h.lowerTrigram, h.upperTrigram),
-}));
-
-export const HEXAGRAM_BY_NUMBER: Map<number, Hexagram> = new Map(HEXAGRAMS.map((h) => [h.number, h]));
-
-/** Binary string (bottom to top, e.g. "111111") -> hexagram, for resolving a cast. */
-export const HEXAGRAM_BY_BINARY: Map<string, Hexagram> = new Map(
-  HEXAGRAMS.map((h) => [h.lines.join(''), h]),
-);
-
 if (HEXAGRAMS.length !== 64) {
   throw new Error(`i-ching: expected 64 hexagrams, got ${HEXAGRAMS.length}`);
 }
-if (HEXAGRAM_BY_BINARY.size !== 64) {
+const binaryKeys = new Set(HEXAGRAMS.map((h) => h.lines.join('')));
+if (binaryKeys.size !== 64) {
   throw new Error('i-ching: hexagram binary codes are not a bijection over the 64 trigram pairs');
 }
