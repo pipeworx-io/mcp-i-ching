@@ -1,6 +1,6 @@
 {
   "name": "@pipeworx/mcp-i-ching",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "i-ching — cast the I Ching with coins or yarrow stalks, and look up any of the 64 hexagrams (King Wen sequence).",
   "type": "module",
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
     "mode": "gateway",
     "slug": "i-ching",
     "gatewaySlug": "i-ching",
-    "sourceHash": "v1-038f73d93d746284c327067bd6557bd47e651586dea2e4a19d56fe66b1388673",
-    "sourceCommit": "4844029e402d6bd2fe735add8abf6d46735f8ed5"
+    "sourceHash": "v1-9524a66381133e20f16ca4eca815cc8b6c5de15c6fe9236faf8d03a5a28e88eb",
+    "sourceCommit": "0ca9712c0ac03bb0121cc7e81b202d0c45ac02ca"
   }
 }
